@@ -1,5 +1,5 @@
 # MonoShot
-A web app that makes applying video and image enhancements a breeze. 
+A web app that makes video and image enhancements a breeze. 
 
 ![](/ScreenShots/screenshot.png)
 

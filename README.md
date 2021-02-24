@@ -30,7 +30,8 @@ streamlit run app.py
 
 - The above command will automatically open the app in your default browser.
 
-- In case the app does not show up, you may copy and paste the Local URL displayed on your CMD/ Terminal's window, similar to this:
+- In case the app does not show up, you can copy and paste the Local URL (displayed on your CMD/ Terminal's window) into your browser.
+The URL should look similar to this:
 ```bash
  You can now view your Streamlit app in your browser.
 

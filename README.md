@@ -5,9 +5,9 @@ A web app that makes video and image enhancements a breeze.
 
 ## Installations and Dependencies
 
-1. [Python](https://www.python.org) Installed.
+- [Python](https://www.python.org) Installed.
 
-2. Open Terminal/ Command Prompt and type in:
+- Open Terminal/ Command Prompt and type in:
 
 -> Windows Users
 
@@ -23,19 +23,21 @@ pip3 install -r /path/to/requirements.txt
 
 ## Usage
 
-1. Inside the Repository's directory, Open Terminal/ Command Prompt and type in:
-
--> Windows Users
-
+- Inside the Repository's directory, Open Terminal/ Command Prompt and type in:
 ```bash
-python app.py
+streamlit run app.py
 ```
 
--> MacOS/Linux Users
+- The above command will automatically open the app in your default browser.
 
+- In case the app does not show up, you may copy and paste the Local URL displayed on your CMD/ Terminal's window, similar to this:
 ```bash
-python3 app.py
+ You can now view your Streamlit app in your browser.
+
+  Local URL: http://localhost:8501
+  Network URL: http://192.168.x.x:8501
 ```
-## Note
+
+### Note
 
 - Kindly do not move, delete, rename or modify any files (unless you know what you are doing).

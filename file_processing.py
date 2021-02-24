@@ -236,21 +236,3 @@ class FileProcessor:
         # " \n\x0c" is a string that is returned when the img does not contain any text 
         if text !=  " \n\x0c":
             return text
-
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

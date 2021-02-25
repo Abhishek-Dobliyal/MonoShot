@@ -28,7 +28,8 @@ class FileProcessor:
         width, height = file.get(3), file.get(4)
 
         # Return true if the file uploaded has dimensions btw 480p and 1080p
-        return width in range(852, 1921) and height in range(480, 1081) 
+        return (int(width) in range(852, 1921) and int(height) in range(480, 1081)) \
+               or (int(height) in range(852, 1921) and int(width) in range(480, 1081))
         
     def generate_shot(self, output_path, slowmo=False, 
                        timelapse=False, gif=False, 

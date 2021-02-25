@@ -185,6 +185,7 @@ def main():
 
             video_duration = processor.get_duration()
             has_required_dim = processor.get_dimensions()
+            st.write(has_required_dim)
 
             if video_duration > 30:
                 display_msg("Oops! Video too long to be processed!", -1)
@@ -305,7 +306,8 @@ def main():
             else:
                 display_msg("Please select atleast a single option to proceed.", 0)
 
-        file_data.close() # Delete the temp file after all the operations. 
+        file_data.close() # Delete the temp file after all the operations.
+        shutil.rmtree("./temp_files") 
 
         helper_widget = st.empty()
         processed_files = os.listdir(PROCESSED_DATA_PATH)

@@ -185,7 +185,6 @@ def main():
 
             video_duration = processor.get_duration()
             has_required_dim = processor.get_dimensions()
-            st.write(has_required_dim)
 
             if video_duration > 30:
                 display_msg("Oops! Video too long to be processed!", -1)

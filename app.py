@@ -113,7 +113,8 @@ def display_info_sections():
 
             * If satisfied with the results:
                 - If the output is an image file then right click on the file and 
-                select the **Save as** option to download the output.
+                select the **Save as** option to download the output ( This applies to
+                GIFs and Boomerangs as well ).
                 
                 - If it is a video file then click on the **Three dots** present at 
                 the bottom right corner inside the video player and select **Download**.

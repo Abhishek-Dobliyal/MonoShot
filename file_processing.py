@@ -28,8 +28,22 @@ class FileProcessor:
         width, height = file.get(3), file.get(4)
 
         # Return true if the file uploaded has dimensions btw 480p and 1080p
-        return (int(width) in range(852, 1921) and int(height) in range(480, 1081)) \
-               or (int(height) in range(852, 1921) and int(width) in range(480, 1081))
+        return (int(width) in range(640, 1921) and int(height) in range(360, 1081)) \
+               or (int(height) in range(640, 1921) and int(width) in range(360, 1081))
+
+    def reduce_img_size(self, img, output_path, output_filename):
+        ''' Reduces img file size '''
+        WIDTH, HEIGHT = 1280, 720
+        try:
+            pil_img = Image.fromarray(img)
+        except:
+            resized_img = img.resize((WIDTH, HEIGHT), Image.ANTIALIAS)
+            resized_img.save(f"./{output_path}/{output_filename}.png", optimize=True,
+                            quality=95)
+        else:
+            resized_img = pil_img.resize((WIDTH, HEIGHT), Image.ANTIALIAS)
+            resized_img.save(f"./{output_path}/{output_filename}.png", optimize=True,
+                            quality=95)
         
     def generate_shot(self, output_path, slowmo=False, 
                        timelapse=False, gif=False, 
@@ -38,7 +52,7 @@ class FileProcessor:
         video file '''
         if slowmo or timelapse:
             video = cv2.VideoCapture(self.__file)
-            FW, FH = int(video.get(3)), int(video.get(4))
+            FW, FH = 1280, 720
             FOUR_CC = cv2.VideoWriter_fourcc(*"AVC1")
 
             if slowmo:
@@ -48,7 +62,10 @@ class FileProcessor:
                     ret, frame = video.read()
                     if not ret:
                         break
-                    output.write(frame)
+
+                    resized = cv2.resize(frame, (FW,FH), fx=0, fy=0, 
+                                        interpolation=cv2.INTER_CUBIC)
+                    output.write(resized)
 
             elif timelapse:
                 FPS = 30
@@ -60,9 +77,10 @@ class FileProcessor:
                     ret, frame = video.read()
                     if not ret:
                         break
-
                     if count % speed == 0:
-                        frames.append(frame)
+                        resized = cv2.resize(frame, (FW,FH), fx=0, fy=0, 
+                                            interpolation=cv2.INTER_CUBIC)
+                        frames.append(resized)
 
                     count += 1
 
@@ -73,17 +91,17 @@ class FileProcessor:
             output.release()
 
         elif gif:
-            video_file = VideoFileClip(self.__file).resize(0.6)
+            video_file = VideoFileClip(self.__file).resize(0.5)
             video_file.write_gif(f"./{output_path}/sample.gif")
         
         elif boomerang[0]:
             start, end = boomerang[1], boomerang[2]
-            video_file = VideoFileClip(self.__file).resize(0.6)
+            video_file = VideoFileClip(self.__file).resize(0.7)
 
             clip = video_file.subclip(start, end) # Get subclip from the video file
             clip = clip.fx(vfx.crop, x1=115, x2=399, y1=0, y2=288)
 
-            speed_clip = clip.speedx(2)
+            speed_clip = clip.speedx(4)
             reversed_speed_clip = speed_clip.fx(vfx.time_mirror)
 
             final = concatenate_videoclips([speed_clip, reversed_speed_clip]) # Merge the clips
@@ -120,7 +138,7 @@ class FileProcessor:
         elif color_level != 1.0:
             pil_img = ImageEnhance.Color(pil_img).enhance(color_level)
 
-        pil_img.save(f"{output_path}/enhanced_img.png")
+        self.reduce_img_size(pil_img, output_path, "enhanced_image")
 
     def enhance_resolution(self, output_path):
         ''' Enhance the resolution of the image
@@ -137,7 +155,7 @@ class FileProcessor:
         final_img = sr.upsample(img)
 
         final_img = cv2.fastNlMeansDenoisingColored(final_img, None, 10, 10, 7, 15) # Remove Noise
-        cv2.imwrite(f"./{output_path}/enhanced_resolution.png", final_img)
+        self.reduce_img_size(final_img, output_path, "enhanced_resolution")
 
     def apply_filter(self, output_path, filter=None):
         ''' Apply specified filter to the image '''
@@ -149,15 +167,15 @@ class FileProcessor:
             smooth_img = cv2.GaussianBlur(inverted_img, (21,21), sigmaX=0, sigmaY=0)
 
             final_img = cv2.divide(gray, 255 - smooth_img, scale=256)
-            cv2.imwrite(f"./{output_path}/pencil_sketch.png", final_img)
+            self.reduce_img_size(final_img, output_path, "pencil_sketch")
         
         elif filter == "Faded":
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            cv2.imwrite(f"./{output_path}/faded.png", gray)
+            self.reduce_img_size(gray, output_path, "faded")
         
         elif filter == "Water Colored":
-            final_img = cv2.stylization(img, sigma_s=60, sigma_r=0.07)
-            cv2.imwrite(f"./{output_path}/water_colored.png", final_img)
+            final_img = cv2.stylization(img, sigma_s=130, sigma_r=0.20)
+            self.reduce_img_size(final_img, output_path, "water_colored")
         
         elif filter == "Cartoonify":
             smooth_img = cv2.bilateralFilter(img, 10, 250, 250)
@@ -166,11 +184,14 @@ class FileProcessor:
             gray = cv2.cvtColor(smooth_img, cv2.COLOR_BGR2GRAY)
             img_blur = cv2.medianBlur(gray, 5)
             img_edge = cv2.adaptiveThreshold(img_blur, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
-                                            cv2.THRESH_BINARY, 7, 2)
+                                            cv2.THRESH_BINARY, 9, 10)
 
             # Multiply the original and edge lined img
             final_img = cv2.bitwise_and(smooth_img, smooth_img, mask=img_edge)
             cv2.imwrite(f"./{output_path}/cartoonified.png", final_img)
+        
+            self.reduce_img_size(final_img, output_path, "catoonify")
+
         
         elif filter == "Document":
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -178,7 +199,7 @@ class FileProcessor:
                                                     cv2.THRESH_BINARY, 151, 10)
             final_img = cv2.medianBlur(adaptive_thresh, 3)
             
-            cv2.imwrite(f"./{output_path}/document.png", final_img)
+            self.reduce_img_size(final_img, output_path, "document")
         
         elif filter == "Vigenette":
             rows, cols = img.shape[:2]
@@ -195,18 +216,18 @@ class FileProcessor:
             final_img[:, :, 1] = img[:, :, 1] * kernel
             final_img[:, :, 2] = img[:, :, 2] * kernel
 
-            cv2.imwrite(f"./{output_path}/vigenette.png", final_img)
+            self.reduce_img_size(final_img, output_path, "vigenette")
         
         elif filter == "Phantom":
             # Kernel to apply the effect
             kernel = np.array([[1, 1, 1], [1, -8, 1], [1, 1, 1]])
             final_img = cv2.filter2D(img, -1, kernel) # Apply a Filter with given kernel
 
-            cv2.imwrite(f"./{output_path}/phantom.png", final_img)
+            self.reduce_img_size(final_img, output_path, "phantom")
         
         elif filter == "Negative":
             final_img = cv2.bitwise_not(img)
-            cv2.imwrite(f"./{output_path}/negative.png", final_img)
+            self.reduce_img_size(final_img, output_path, "negative")
 
     def extract_txt(self):
         ''' Extract text from images '''

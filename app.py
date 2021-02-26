@@ -98,6 +98,7 @@ def display_info_sections():
     ''' Displays the instructions and about section '''
     help_expander = st.beta_expander("Instructions")
     about_expander = st.beta_expander("About")
+
     instructions = '''
             * **Choose or Drag N Drop** a file to upload. For a video file, the duration must not exceed 
             the 30 seconds mark.
@@ -137,9 +138,10 @@ def display_info_sections():
 
             #### Hope You Like It :blush:
     '''
-    with help_expander:
+    with help_expander: # Instructions
         help_expander.markdown(instructions, unsafe_allow_html=True)
-    with about_expander:
+
+    with about_expander: # About
         about_expander.markdown(about, unsafe_allow_html=True)
 
 # Main App
@@ -191,7 +193,7 @@ def main():
                 display_msg("Oops! Video too long to be processed!", -1)
             
             elif not has_required_dim:
-                display_msg("Oops! Allowed Resolutions are: 480p, 720p and 1080p", -1)
+                display_msg("Oops! Allowed Resolutions are: 360p, 480p, 720p and 1080p", -1)
 
             else:
                 # SideBar Widgets 
